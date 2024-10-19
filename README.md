@@ -26,8 +26,8 @@ El script permite realizar el preprocesamiento completo de imágenes fMRI, con l
    - **Interfaz Gráfica**: Si está disponible Zenity (no compatible aún con macOS).
    - **Terminal**: Si no se instala Zenity o prefieres este método, puedes ingresar la ruta del archivo manualmente.
   
-2. **Recorte de Cuello** (`robustfov`): 
-   - El script realiza un recorte de cuello en la imagen seleccionada utilizando la herramienta `robustfov`.
+2. **Recorte del FOV** (`robustfov`): 
+   - El script realiza un recorte deL Field Of View (FOV) en la imagen seleccionada utilizando la herramienta `robustfov`.
 
 3. **Extracción del Cerebro** (`bet`)[_En proceso_]: 
    - Realiza la extracción de la estructura cerebral en las imágenes para aislar el cerebro de otras estructuras.
