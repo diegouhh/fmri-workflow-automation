@@ -2,8 +2,6 @@
 
 Este script está diseñado para automatizar el **preprocesamiento de imágenes de resonancia magnética funcional (fMRI)** utilizando herramientas como `robustfov`, `bet` y `FEAT`. Proporciona opciones para seleccionar archivos tanto mediante una interfaz gráfica como por terminal.
 
-5
-
 ## Requisitos
 
 Para que el script funcione correctamente, debes cumplir con los siguientes requisitos:
