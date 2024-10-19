@@ -26,13 +26,13 @@ El script permite realizar el preprocesamiento completo de imágenes fMRI, con l
    - **Interfaz Gráfica**: Si está disponible Zenity (no compatible aún con macOS).
    - **Terminal**: Si no se instala Zenity o prefieres este método, puedes ingresar la ruta del archivo manualmente.
   
-2. **Recorte del FOV** (`robustfov`): 
+2. **Recorte del FOV** (`robustfov`):
    - El script realiza un recorte deL Field Of View (FOV) en la imagen seleccionada utilizando la herramienta `robustfov`.
 
-3. **Extracción del Cerebro** (`bet`)[_En proceso_]: 
+3. **Extracción del Cerebro** [`bet`](*En proceso*):
    - Realiza la extracción de la estructura cerebral en las imágenes para aislar el cerebro de otras estructuras.
 
-4. **Preprocesamiento Completo** (`FEAT`)[_En proceso_]: 
+4. **Preprocesamiento Completo** [`FEAT`](*En proceso*):
    - La automatización incluye la ejecución de un flujo de trabajo completo de preprocesamiento mediante `FEAT`, ideal para análisis avanzados de fMRI.
 
 5. **Mensajes Informativos**: Al final de cada fase, el script informará de la finalización del proceso y la ubicación del archivo guardado.
@@ -51,12 +51,15 @@ Si Zenity no está instalado, el script detecta la distribución de Linux e inte
 ## Uso
 
 1. **Clonar el repositorio**:
+
    ```bash
    git clone https://github.com/diegouhh/fmri-workflow-automation.git
    cd fmri-workflow-automation
 2. **Dar permisos de ejecución**:
+
     ```bash
     chmod +x Prototipo1.sh
 3. **Ejecutar el script**:
+
     ```bash
     ./Prototipo1.sh
