@@ -517,7 +517,7 @@ if [ "$continuar" = true ]; then
     echo -e "\nConfirmación recibida. Procediendo con la conversión de imágenes."
     convertir_png
     generar_html_resultados
-    rm lista_imagenes_a_procesar_bet.txt
+    rm "$ruta_directorio_bids"/lista_imagenes_a_procesar_bet.txt
 else
     echo -e "\nNo se recibió respuesta. Conversión de imágenes cancelada."
 fi
