@@ -35,7 +35,7 @@
 #
 # ==================================================================================
 
-# Variables de color
+# Variables de color (mostrados en la terminal)
 COLOR_ERROR="\e[38;5;203m"    # Rojo claro
 COLOR_ADVERTENCIA="\e[38;5;190m"  # Amarillo claro
 COLOR_EXITO="\e[38;5;154m"  # Verde claro
