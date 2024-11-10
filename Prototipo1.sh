@@ -41,6 +41,7 @@ COLOR_ADVERTENCIA="\e[38;5;190m"  # Amarillo claro
 COLOR_EXITO="\e[38;5;154m"  # Verde claro
 COLOR_MODULO="\e[38;5;99m"    # Divide comandos principales
 COLOR_NORMAL="\e[0m"          # Color normal
+procesos_paralelos="8"
 
 # Mensaje de introducción
 echo -e "${COLOR_MODULO}=============================================="
@@ -109,7 +110,7 @@ procesar_archivo_bids(){
     # Ejecuta robustfov en paralelo con xargs y 4 procesos
     echo -e "${COLOR_MODULO}Iniciando la reducción del FOV (Robustfov)${COLOR_NORMAL}"    
     echo -e "Reducción del FOV en curso..."
-    cat "$ruta_directorio_bids"/lista_imagenes_a_procesar_robustfov.txt | xargs -P 5 -I {} robustfov -i {} -r "{}_crop.nii.gz" >/dev/null
+    cat "$ruta_directorio_bids"/lista_imagenes_a_procesar_robustfov.txt | xargs -P "${procesos_paralelos}" -I {} robustfov -i {} -r "{}_crop.nii.gz" >/dev/null
 
     # Eliminar el archivo lista_imagenes_a_procesar_robustfov.txt después de terminar el procesamiento
     rm "$ruta_directorio_bids/lista_imagenes_a_procesar_robustfov.txt"
@@ -349,7 +350,7 @@ else
     echo "BET en curso..."
 
     # Ejecuta el comando BET en paralelo
-    cat "$ruta_directorio_bids"/lista_imagenes_a_procesar_bet.txt | xargs -P 5 -I {} bet {} "{}_brain.nii.gz"
+    cat "$ruta_directorio_bids"/lista_imagenes_a_procesar_bet.txt | xargs -P "${procesos_paralelos}" -I {} bet {} "{}_brain.nii.gz"
 
 
 # Mensaje indicando que el proceso ha finalizado
@@ -453,7 +454,7 @@ generar_html_resultados(){
 
 
     # Abre el HTML en el navegador
-    xdg-open "$ruta_html"
+    xdg-open "$ruta_html" &
 
     # Espera que el usuario ingrese los nombres seleccionados
     echo -e "Revisa el HTML y selecciona las imágenes a cambiar. Ingresa el número del archivo sin extensión seguido de + o -, separados por comas."
