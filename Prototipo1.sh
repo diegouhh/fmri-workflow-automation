@@ -283,7 +283,16 @@ elif [[ "$opcion_entrada" == "b" || "$opcion_entrada" == "B" ]]; then
             else
                 # Si Zenity está instalado, solicitar la ruta del archivo mediante un cuadro de diálogo gráfico
                 echo -e "\nSelecciona un directorio en estándar BIDS."
-                ruta_directorio_bids=$(zenity --file-selection --directory --title="Selecciona un directorio en estándar BIDS" --filename="$HOME/" 2>/dev/null)
+
+                # Detectar si se está en WSL
+                if grep -qi microsoft /proc/version; then
+                    # Configuración para WSL: Ruta de usuario en Windows
+                    ruta_inicial="/mnt/c/Users/$USER"
+                else
+                    # Configuración para Linux: Ruta de usuario de Linux
+                    ruta_inicial="$HOME"
+                fi
+                ruta_directorio_bids=$(zenity --file-selection --directory --title="Selecciona un directorio en estándar BIDS" --filename="$ruta_inicial/" 2>/dev/null)
 
                 # Comprobar si se seleccionó un directorio
                 if [[ -z "$ruta_directorio_bids" ]]; then
@@ -400,6 +409,7 @@ generar_html_resultados(){
             .gallery-item { width: 300px; text-align: center; }
             .gallery-item img { width: 100%; height: auto; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; }
             .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }
+
             /* Modal para vista previa */
             .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 10; }
             .modal-content { max-width: 90%; max-height: 90%; display: flex; align-items: center; justify-content: center; }
@@ -412,7 +422,21 @@ generar_html_resultados(){
         Ajuste el parámetro <code>-f</code> en BET para recortar más o menos cráneo según sea necesario.</p>" >> "$ruta_html"
     echo -e "<div class='gallery'>" >> "$ruta_html"
 
-    # Agrega las imágenes a la galería con checkboxes
+    if grep -qi microsoft /proc/version; then
+        for img in "$ruta_directorio_bids/derivatives/png_converted"/*.png; do
+        nombre_archivo=$(basename "$img")
+
+        img_windows=$(wslpath -w "$img")  # Convierte a formato Windows
+        
+        echo -e "<div class='gallery-item'>
+                <input type='checkbox' id='$nombre_archivo' name='imagen_seleccionada' value='$nombre_archivo'>
+                <label for='$nombre_archivo'><a href='$img_windows' target='_blank'>$nombre_archivo</a></label>
+                <br>
+                <img src='$img_windows' alt='$nombre_archivo' onclick='openModal(\"$img_windows\")'>
+            </div>" >> "$ruta_html"
+        done
+    else
+    # Agrega las imágenes a la galería con checkboxes(linux)
     for img in "$ruta_directorio_bids/derivatives/png_converted"/*.png; do
         nombre_archivo=$(basename "$img")
         echo -e "<div class='gallery-item'>
@@ -422,7 +446,7 @@ generar_html_resultados(){
                     <img src='$img' alt='$nombre_archivo' onclick='openModal(\"$img\")'>
                 </div>" >> "$ruta_html"
     done
-
+fi
     echo -e "</div>" >> "$ruta_html"
 
     # Modal para vista previa
@@ -452,13 +476,36 @@ generar_html_resultados(){
     echo -e "${COLOR_EXITO}HTML generado en: $ruta_html${COLOR_NORMAL}"
 
 
+# Determina el entorno (WSL o Linux) y abre el HTML en el navegador
+    if grep -qi microsoft /proc/version; then
+        # Adaptar la ruta para WSL
+        ruta_windows=$(wslpath -w "$ruta_html")
+        if command -v "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" &> /dev/null; then
+            "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" "$ruta_windows" &
+        elif command -v "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe" &> /dev/null; then
+            "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe" "$ruta_windows" &
+        elif command -v "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" &> /dev/null; then
+            "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" "$ruta_windows" &
+        else
+            echo "No se encontró Edge ni Chrome en el sistema."
+        fi
+    else
+        # Para Linux
+        if command -v xdg-open &> /dev/null; then
+            xdg-open "$ruta_html" &
+        else
+            echo "No se encontró un navegador compatible en Linux."
+        fi
+    fi
 
-    # Abre el HTML en el navegador
-    xdg-open "$ruta_html" &
+    echo -e "\nPor favor, revisa el HTML generado y selecciona las imágenes que deseas modificar.\n"
+    echo "Ingresa el número del archivo (correspondiente al paciente) seguido de '+' o '-', separados por comas."
+    echo "Por ejemplo, para ajustar la imagen de 'sub-05', puedes ingresar '5+' para aumentarlo o '5-' para disminuirlo."
+    echo "Recuerda que al ingresar un número seguido de '+' o '-', estarás aumentando o disminuyendo el umbral de recorte en 0.1, respectivamente."
+    echo -e "Ejemplo de entrada: 5+, 6-, 7+ (esto indicará aumentar el umbral de 'sub-05', disminuir el de 'sub-06' y aumentar el de 'sub-07').\n"
 
-    # Espera que el usuario ingrese los nombres seleccionados
-    echo -e "Revisa el HTML y selecciona las imágenes a cambiar. Ingresa el número del archivo sin extensión seguido de + o -, separados por comas."
-    read -p "Ingresa tu selección: " seleccion_input
+    # Espera la entrada del usuario
+    read -p "Ingresa tu selección (número del paciente seguido de + o -): " seleccion_input
 
     # Define la ruta para guardar las selecciones con el parámetro adecuado
     seleccion_txt="$ruta_directorio_bids/derivatives/png_converted/seleccion.txt"
@@ -491,34 +538,33 @@ for seleccion in $selecciones; do
                 echo "$archivo_original $archivo_salida -f 0.4" >> "$seleccion_txt"
             fi
         else
-            echo "El archivo $archivo_numero no existe en lista_imagenes_a_procesar_bet.txt. Se realizará nuevamente el BET para los demás."
+            echo "El archivo para el paciente 'sub-${archivo_numero}' no se encontró en la lista de imágenes a procesar. No se aplicarán ajustes para este paciente."
         fi
     else
-        echo "Advertencia: Entrada '$seleccion' no válida. Asegúrate de usar el formato correcto (número seguido de + o -)."
+        echo "Advertencia: La entrada '$seleccion' no es válida. Asegúrate de usar el formato correcto (número de paciente seguido de + o -)."
     fi
 done
-
-
-    echo -e "Tu selección fue guardada en: $seleccion_txt"
-    
+    echo -e "Tu selección ha sido guardada en el archivo: $seleccion_txt"
 }
 
 # ==================================================================================
 # Confirmación de conversión con cuenta regresiva
 # ==================================================================================
 echo -e "\n" # Salto de línea para mejor estructura de la salida terminal 
-echo "Presiona cualquier tecla para confirmar la conversión de imágenes"
+echo -e "Presiona cualquier tecla para confirmar la previsualización de los resultados BET\n"
+echo "En esta previsualización, podrás verificar el recorte y ajustar el umbral si es necesario."
+
 # Contador regresivo para mostrar en la terminal
-for ((i=60; i>0; i--)); do
-    echo -n -e " Procederemos en $i segundos...   \r"
+for ((i=60; i>-1; i--)); do
+    echo -n -e " Omitiendo previsualización en $i segundos...   \r"
     read -t 1 -n 1 input && continuar=true && break
 done
 
 if [ "$continuar" = true ]; then
-    echo -e "\nConfirmación recibida. Procediendo con la conversión de imágenes."
+    echo -e "\nConfirmación recibida. Procediendo con la previsualización."
     convertir_png
     generar_html_resultados
     rm "$ruta_directorio_bids"/lista_imagenes_a_procesar_bet.txt
 else
-    echo -e "\nNo se recibió respuesta. Conversión de imágenes cancelada."
+    echo -e "\nNo se recibió respuesta. Previsualización BET cancelada."
 fi
