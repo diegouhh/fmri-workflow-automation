@@ -5,23 +5,61 @@
 # Autores: Juan Diego Ortega Álvarez, Juan José Sierra Peña. - Bioingeniería.
 # Descripción:
 # Este script automatiza el procesamiento de imágenes de resonancia magnética 
-# funcional en tarea (task-fMRI) usando herramientas especializadas como `robustfov`, `bet` y 
-# `FEAT`. Permite realizar el recorte de la región del cuello, extraer el cerebro 
-# y configurar un flujo de trabajo automatizado para el preprocesamiento de fMRI.
+# funcional en tarea (task-fMRI) utilizando herramientas especializadas de FSL 
+# como `robustfov`, `bet` y `FEAT`. El flujo de trabajo incluye el recorte 
+# de la región del cuello, la extracción del cerebro y la configuración 
+# automatizada de los pasos para el preprocesamiento de datos de fMRI.
 #
 # El script ofrece opciones para seleccionar archivos tanto de forma gráfica 
 # como desde la terminal, asegurando la correcta ejecución de cada proceso y 
 # confirmando la instalación de herramientas como `Zenity` para la selección 
 # gráfica de archivos, si es necesario.
 #
-# Ejemplo de Uso:
+# Guía de Uso:
 # 1. Clona el repositorio y accede a la carpeta:
+#    Antes de clonar el repositorio, navega a la carpeta donde deseas almacenar el repositorio clonado.
+#    Puedes hacerlo con el comando `cd` para cambiar a la ubicación deseada. Por ejemplo:
+#    cd /ruta/a/la/carpeta/destino
+#
+#    Luego, clona el repositorio desde GitHub a tu máquina local usando el siguiente 
+#    comando. Esto descargará todos los archivos necesarios para ejecutar el script:
 #    git clone https://github.com/diegouhh/fmri-workflow-automation.git
+#
+#    Una vez clonado, navega a la carpeta del repositorio clonado para acceder al script:
 #    cd fmri-workflow-automation
+#
 # 2. Otorga permisos de ejecución al script:
+#    Antes de ejecutar el script, es necesario otorgarle permisos de ejecución. 
+#    Usa el siguiente comando para asegurarte de que el archivo `fmri_processing_pipeline.sh` 
+#    sea ejecutable:
 #    chmod +x fmri_processing_pipeline.sh
+#
 # 3. Ejecuta el script:
+#    Una vez que el script tenga permisos de ejecución, ya puedes correrlo. 
+#    Para ello, puedes usar alguna de las siguientes opciones:
+#
+#    Opción 1: Ejecución directa con ./ (modo estándar):
+#    Este es el método más común y sencillo. Simplemente ejecuta el script con el siguiente comando:
 #    ./fmri_processing_pipeline.sh
+#
+#    Opción 2: Ejecución usando `bash` explícitamente:
+#    Si prefieres usar `bash` para ejecutar el script directamente, puedes hacerlo con el siguiente comando:
+#    bash fmri_processing_pipeline.sh
+#
+# 4. Selección de archivos:
+#    Cuando ejecutes el script, se te solicitará seleccionar los archivos de entrada, 
+#    ya sea mediante una ventana gráfica (si tienes Zenity instalado) o a través de 
+#    la terminal. El script guiará cada paso del proceso.
+#
+# 5. Confirmación y ejecución:
+#    El script realizará las tareas de procesamiento, como el recorte de la región 
+#    del cuello, la extracción del cerebro y la configuración del análisis de fMRI.
+#    Asegúrate de que las herramientas de FSL (robustfov, bet y FEAT) estén 
+#    correctamente instaladas antes de ejecutar el script.
+#
+# 6. Visualización de resultados:
+#    Tras la ejecución, el script generará los archivos de salida que podrás 
+#    revisar y usar para los siguientes pasos en tu análisis de fMRI.
 #
 # Requisitos:
 # - Linux o sistema operativo basado en Unix con Bash.
@@ -29,7 +67,7 @@
 # - Opcional: Zenity para la selección gráfica de archivos.
 #
 # Próximas Funcionalidades:
-# - Procesamiento en lote de múltiples imágenes en una sola ejecución.
+# - Procesamiento en lote de múltiples imágenes en una sola ejecución (FEAT).
 # - Optimización para detectar y omitir el procesamiento si ya existen archivos _crop.
 # - Compatibilidad con el estándar BIDS para organizar los resultados en carpetas de derivados.
 #
