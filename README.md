@@ -1,4 +1,4 @@
-# Automatización del Preprocesamiento de fMRI
+# Automatización del Preprocesamiento de fMRI (README desactualizado)
 
 Este script está diseñado para automatizar el **preprocesamiento de imágenes de resonancia magnética funcional (fMRI)** utilizando herramientas como `robustfov`, `bet` y `FEAT`. Proporciona opciones para seleccionar archivos tanto mediante una interfaz gráfica como por terminal.
 
